@@ -1,0 +1,193 @@
+<!-- Control -->
+<div class="mob-center row row-centered">
+  <!-- Row -->
+  <div class="col-md-2 align-centered" style="padding-right: 10px;">
+    Show
+    <select class="form-control-loocho" [(ngModel)]="nbRows" (change)="updateList($event.target.value)">
+      <option style="cursor: pointer">10</option>
+      <option style="cursor: pointer" selected>20</option>
+      <option style="cursor: pointer">50</option>
+      <option style="cursor: pointer">150</option>
+    </select>
+    rows
+  </div>
+  <!-- Search -->
+  <div class="col-md-3 align-centered no-padding form-control-search-div">
+    <div class="inner-addon right-addon">
+      <i class="glyphicon glyphicon-search"></i>
+      <input placeholder="Search Picklists" type="text" class="form-control form-control-search" />
+    </div>
+  </div>
+  <!-- Create new -->
+  <div class="div-right">
+    <button class="btn btn-loocho btn-sm" (click)="createPicklist()">
+      <span class="icon-plus"></span> CREATE NEW
+    </button>
+  </div>
+</div><br />
+<!-- =============== -->
+
+<!-- Table -->
+
+<table class="table table-hover table-striped">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr class="clickable" *ngFor="let picklist of picklists" (click)="editPicklist(picklist)">
+    <td>{{ picklist._id }}</td>
+    <td>{{ picklist.desc }}</td>
+  </tr>
+  </tbody>
+</table>
+<!-- =============== -->
+
+<!-- Pagination -->
+
+<nav class="nav-pagination">
+  <ul class="pagination" *ngIf="pageList.length > 1">
+    <li>
+      <a href="javascript:void(0)" (click)="pageNb = pageNb - 1; updateList();" *ngIf="pageNb !== 1">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    <li *ngFor="let page of pageList">
+      <a href="javascript:void(0)"
+         [ngClass]="{firstPage: (page === 1 && pageNb === 1), lastPage: (page === lastPage && page === pageNb)}"
+         (click)="pageNb = page; updateList()"
+         [class.page-selected]="page === pageNb"
+      >{{page}}</a>
+    </li>
+    <li>
+      <a href="javascript:void(0)" (click)="pageNb = pageNb + 1; updateList();" *ngIf="pageNb !== lastPage">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+<!-- =============== -->
+
+<!-- Display Modal -->
+
+<div [displayModal]="mode && currentPicklist" size="lg" [blocked]="true">
+  <div class="modal-content modal-dialog">
+    <div class="modal-header">
+      <div class="pull-right">
+        <button
+          style="margin-right: 10px;width: 80px;"
+          *ngIf="mode === 'edit'" class="btn btn-loocho btn-sm" (click)="editMode = !editMode">
+          <span [class.icon-eye]="editMode" [class.icon-note]="!editMode"></span>
+          {{ editMode ? ' View' : ' Edit' }}
+        </button>
+        <span class="icon-close close" (click)="cancelAction()" aria-hidden="true"></span>
+      </div>
+      <h1 class="modal-title">
+        {{ mode === 'edit' ? 'Edit a ' : 'Create a new ' }} picklist
+      </h1>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="error" class="callout callout-danger">{{error}}</div>
+      <div role="form">
+        <div class="form-group">
+          <label for="ID">ID : </label>
+          <span id="ID" *ngIf="mode === 'edit' && !editMode">{{ currentPicklist._id }}</span>
+          <input id="ID"
+                 [(ngModel)]="currentPicklist._id"
+                 class="form-control" *ngIf="mode === 'create' || editMode"
+                 [disabled]="editMode && mode === 'edit'"/>
+        </div>
+        <div class="form-group">
+          <label for="desc">Description : </label>
+          <span id="desc" *ngIf="mode === 'edit' && !editMode">{{ currentPicklist.desc }}</span>
+          <input id="desc" [(ngModel)]="currentPicklist.desc" class="form-control" *ngIf="mode === 'create' || editMode"/>
+        </div>
+        <div class="form-group" style="margin-bottom: 0">
+          <label for="list">List of values for the picklist : </label>
+          <div class="table-content" style="margin-bottom: 0">
+            <table class="table table-striped" [ngClass]="{ 'table-hover': mode === 'create' || editMode }" id="list">
+              <thead>
+              <tr>
+                <th>Label</th>
+                <th>ID</th>
+                <th>Default</th>
+                <th>IsClosed</th>
+                <th>IsWon</th>
+                <th *ngIf="editMode || mode === 'create'" class="text-center">Delete</th>
+              </tr>
+              </thead>
+              <tbody *ngIf="currentPicklist">
+              <tr [ngClass]="{ clickable: mode === 'create' || editMode, 'item-over': indexOver === i }"
+                  *ngFor="let item of currentPicklist.list; let i = index" [draggable]="editMode || mode === 'create'"
+                  (dragover)="dragValue($event, i)" (drop)="dropValue(i)" (dragstart)="dragStart($event, i)"
+                  (dragleave)="indexOver = null" (dragend)="dragEnd($event)"
+                  (click)="editValue(item, $event)">
+                <td nowrap>{{ item.label }}</td>
+                <td>{{ item._id }}</td>
+                <td>{{ item.default ? 'Yes': '' }}</td>
+                <td>{{ item.isClosed ? 'Yes': '' }}</td>
+                <td>{{ item.isWon ? 'Yes': '' }}</td>
+                <td nowrap class="text-center" *ngIf="editMode || mode === 'create'">
+                  <span class="icon-trash removePickList icon-20" (click)="deleteValue(i)"></span>
+                </td>
+              </tr>
+              <tr *ngIf="currentValue && !(mode === 'edit' && !editMode)">
+                <td nowrap class="text-center text-middle">
+                  <input class="form-control" id="Label" [(ngModel)]="currentValue.label" placeholder="Label" (keyup)="saveValue($event)">
+                </td>
+                <td class="text-center text-middle">ID : {{ currentValue._id }}</td>
+                <td class="text-center text-middle">
+                  <div class="form-horizontal" class="checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="currentValue.default" style="margin-top:5px;"> Default
+                    </label>
+                  </div>
+                </td>
+                <td class="text-center text-middle">
+                  <div class="form-horizontal" class="checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="currentValue.isClosed" style="margin-top:5px;"> IsClosed
+                    </label>
+                  </div>
+                </td>
+                <td class="text-center text-middle">
+                  <div class="form-horizontal" class="checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="currentValue.isWon" style="margin-top:5px;"> IsWon
+                    </label>
+                  </div>
+                </td>
+                <td class="text-center text-middle">
+                  <button class="btn btn-loocho btn-xs" style="margin-bottom: 2px;" (click)="saveValue()">
+                    <span class="icon-check"></span> Save
+                  </button>
+                  <button class="btn btn-loocho btn-xs" style="margin-bottom: 2px;" (click)="cancelValue()">
+                    <span class="icon-close"></span> Cancel
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <span class="icon-plus addPickList icon-20" (click)="addValue()" *ngIf="!currentValue && (editMode || mode === 'create')"></span>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button style="width: 80px;" class="btn btn-sm btn-loocho" (click)="savePicklist(currentPicklist)"
+              *ngIf="editMode || mode === 'create'">
+        <span class="icon-check"></span> SAVE
+      </button>
+      <button style="width: 80px;" class="btn btn-sm btn-loocho" *ngIf="editMode" (click)="deletePicklist()">
+        <span class="icon-trash"></span> DELETE
+      </button>
+      <button style="width: 80px;" class="btn btn-sm btn-loocho" (click)="cancelAction()">
+        <span class="icon-close"></span> {{ editMode ? 'CANCEL' : 'CLOSE' }}
+      </button>
+    </div>
+  </div>
+</div>
+<!-- =============== -->

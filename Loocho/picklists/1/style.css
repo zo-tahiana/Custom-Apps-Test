@@ -1,0 +1,53 @@
+.addPickList {
+  color: rgb(84, 130, 53);
+}
+
+.cancel {
+  color: rgb(248, 148, 6);
+}
+
+.moveUp, .moveDown {
+  color: #5bc0de;
+}
+
+.icon-20 {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.removePickList {
+  color: #d9534f;
+}
+
+.removePickList:hover {
+  color: red;
+}
+
+.item-over {
+  background-color: #d9ffd9 !important;
+}
+
+.form-control:focus {
+  border-color: #5cb85c;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(92, 184, 92, 0.6);
+}
+
+.text-middle {
+  vertical-align: middle;
+}
+
+.table {
+  min-width: 100px;
+}
+
+.table > tbody > tr > td {
+  min-width: 70px !important;
+}
+
+.firstPage {
+  border-radius: 4px 0 0 4px;
+}
+
+.lastPage {
+  border-radius: 0 4px 4px 0;
+}

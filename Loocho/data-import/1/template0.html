@@ -1,0 +1,379 @@
+<ul class="nav nav-pills nav-wizard">
+  <li class="active">
+    <a href="javascript:;" data-toggle="tab">
+      <span class="step">Step</span> 1<span class="title">: Import File(s)</span>
+    </a>
+    <div class="nav-arrow">
+    </div>
+  </li>
+  <li [ngClass]="{'active': step >= 2 }">
+    <div class="nav-wedge"></div>
+    <a href="javascript:;" data-toggle="tab">
+      <span class="step">Step</span> 2<span class="title">: Mapping</span>
+    </a>
+    <div class="nav-arrow"></div>
+  </li>
+  <li [ngClass]="{'active': step === 3 }">
+    <div class="nav-wedge"></div>
+    <a href="javascript:;" data-toggle="tab">
+      <span class="step">Step</span> 3<span class="title">: Import Data</span>
+    </a>
+  </li>
+</ul>
+
+<div *ngIf="step === 3">
+  <div style="width: 100%; text-align: center; margin-bottom: 10px" *ngIf="!importDone">
+    <button type="button" class="btn btn-default btn-lg" (click)="importData()" [disabled]="importInProgress">
+      <span class="icon-action-redo" *ngIf="!importInProgress"></span>
+      <span *ngIf="!importInProgress"> Launch import</span>
+      <span *ngIf="importInProgress">Importing your data... </span>
+      <img *ngIf="importInProgress" src="media/images/loading.gif" style="width: 25px; height: 25px;">
+    </button>
+  </div>
+
+  <div style="width: 100%; text-align: center; margin-bottom: 10px" *ngIf="importDone">
+    <button type="button" class="btn btn-default btn-lg" (click)="sendAReport(); sendingEmail = true" *ngIf="!sendingEmail">
+      <span class="icon-envelope"></span> Send me a report by email
+    </button>
+  </div>
+</div>
+
+<div class="callout callout-success" *ngIf="infoMessage">{{infoMessage}}</div>
+<div class="callout callout-danger" *ngIf="errorMessage" style="padding: 15px;">
+  <span class="icon-close" style="float: right; cursor: pointer; font-size: 15px;" (click)="errorMessage = ''"></span> {{errorMessage}}
+</div>
+
+<label *ngIf="step === 1" style="margin-bottom: 15px;">
+  Drag and drop your files to import, or click this area for browse computer for files:
+</label>
+<div id="my-drop-zone" *ngIf="step === 1" (click)="browseFile()">
+  <img src="media/flat-icons/upload.png">&nbsp; Drop your files to import, or click here to browse computer for files
+</div>
+<div *ngIf="step === 1">
+  <input id="input-file-import"
+         #filesToDownload
+         class="input-file"
+         type="file"
+         (change)="filterFiles(filesToDownload.files)"
+         multiple
+         style="visibility: hidden"/>
+</div>
+
+<label *ngIf="step === 2">
+  Select each of your file and check the columns to import
+</label>
+
+<div class="progress" *ngIf="step === 3" style="height: 5px;">
+  <div class="progress-bar progress-bar-success" id="account-progression"></div>
+</div>
+
+<div class="table-content" style="margin-top: 10px; margin-bottom: 10px;" >
+  <table class="table table-striped table-hover" *ngIf="files.length">
+    <thead>
+    <tr>
+      <th width="10%">
+        <span class="icon-doc" [style.marginLeft]="step === 2 && files.length > 1 ? '30px' : ''"></span> File Name
+      </th>
+      <th width="5%">
+        <span class="icon-compass"></span> Size
+      </th>
+      <th width="25%" *ngIf="step === 3" style="min-width: 150px; text-align: center;">
+        <span class="icon-tag"></span> Progress
+      </th>
+      <th width="10%" style="text-align: center;" *ngIf="step !== 3">
+        <span class="icon-user"></span> Owner
+      </th>
+      <th width="15%" style="text-align: center; min-width: 150px;">
+        <span class="icon-cloud-upload"></span> Resource
+      </th>
+      <th width="10%" *ngIf="step !== 3" style="text-align: center">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let item of files">
+      <td (click)="step === 2 ? toMap(item) : ''" [class.pointer]="step === 2" style="white-space: nowrap; text-overflow: ellipsis;">
+        <input type="radio"
+              (click)="toMap(item)"
+              [checked]="item._id === currentFileToMap._id"
+              style="margin-right: 15px;"
+              class="pointer"
+              *ngIf="step === 2 && files.length > 1"/>
+        <strong> {{item.name}}</strong>
+      </td>
+      <td (click)="step === 2 ? toMap(item) : ''" [class.pointer]="step === 2">{{item.sizeKb}} KB </td>
+      <th *ngIf="step === 3">
+        <div class="progress">
+          <div class="progress-bar progress-bar-success" [id]="item._id + '-data'">
+            {{item.progress ? item.progress + '%' : ''}}
+          </div>
+        </div>
+      </th>
+      <td *ngIf="step !== 3">
+        <select class="form-control input-sm"
+                style="width: 100%"
+                (change)="item.owner = $event.target.value">
+          <option [value] ="owner._id" *ngFor="let owner of getListOwner()">{{owner.username}}</option>
+        </select>
+      </td>
+      <td>
+        <select #resource class="form-control input-sm" style="width: 100%"
+                (change)="changeResource(resource.value, item)"
+                [disabled]="step === 3">
+          <option valule="" *ngIf="!item.resource"></option>
+          <option *ngFor="let resource of listOfRessource()"
+                  [value]="resource.name"
+                  [selected]="item.resource ? resource.name === item.resource.name : false">
+            {{resource.appAndCore}}
+          </option>
+        </select>
+      </td>
+      <td *ngIf="step !== 3" style="text-align: center;">
+        <button type="button"
+                class="btn btn-default btn-action btn-xs"
+                (click)="removeFile(item)"
+                title="Delete">
+          <span class="icon-trash"></span>
+        </button>
+        <button type="button" class="btn btn-default btn-action btn-xs"
+                (click)="viewer(item)"
+                *ngIf="step !== 1 && item.resultMapping.length"
+                title="Viewer">
+          <span class="icon-magnifier"></span>
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div *ngIf="step === 2">
+  <div class="row" style="min-height: 300px;">
+    <h1 *ngIf="!columnHeader.length" style="text-align: center; margin-top: 125px;">Please, choose a file</h1>
+    <div *ngIf="columnHeader.length" class="col-lg-8 col-md-8 col-sm-8 col-xs-8" style="padding-right: 2px">
+      <div class="elementList">
+        <table class="table table-striped table-hover">
+          <thead>
+          <tr>
+            <th width="50%">Column label from CSV</th>
+            <th width="50%">Column label from Loocho</th>
+          </tr>
+          </thead>
+          <tbody id="resultsMap">
+          <tr *ngFor="let header of columnHeader; let nbCol = index"
+              (drop)="drop($event, trDropZone, headerDropZone, { nbCol: nbCol, header: headerOfFile.innerText })"
+              (dragover)="dragOver($event, trDropZone)"
+              (dragleave)="dragLeave($event, trDropZone)"
+              #trDropZone>
+            <td style="width: 50%" #headerOfFile>{{header}}</td>
+            <td style="width: 50%" id="drop-{{header}}" #headerDropZone>
+              <span class="icon-close pointer"
+                    style="font-size: 14px; float: right; margin-top: 5px; display: none"
+                    (click)="removeLoochoProperty(headerDropZone, nbCol)">
+              </span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="loochoProperty.length" class="col-lg-4 col-md-4 col-sm-4 col-xs-4" id="propertyList" style="padding-left: 2px">
+      <div class="elementList">
+        <table class="table table-striped table-hover">
+          <thead>
+          <tr>
+            <th>Loocho properties</th>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- LOOCHO PROPERTIES -->
+          <tr *ngFor='let field of loochoProperty; let i = index' id="{{field.id}}-prop">
+            <td draggable="true" (dragstart)="drag($event)" id="{{field.id}}" class="draggable" *ngIf="field.title">
+              {{field.label}}
+              <span style="display: none;" class="{{field.field}}">{{field.field}}</span>
+              <span style="display: none;" class="{{field.key}}">{{field.key}}</span>
+              <span style="display: none;" class="{{field.id}}">{{field.id}}</span>
+            </td>
+            <td *ngIf="!field.title">
+              <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                  <th>
+                    <span class="icon-add icon-plus pointer"
+                          (click)="addOneField(field, i)"
+                          *ngIf="field[0] && field[0].increment"
+                          style="margin-top: 5px;"></span>
+                    {{field[0].label}}
+                  </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor='let f of field' id="{{f.id}}-prop">
+                  <td draggable="true" (dragstart)="drag($event)" id="{{f.id}}" class="draggable">
+                    {{f.title}}
+                    <span style="display: none;" class="{{f.field}}">{{f.field}}</span>
+                    <span style="display: none;" class="{{f.key}}">{{f.key}}</span>
+                    <span style="display: none;" class="{{f.id}}">{{f.id}}</span>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <!-- ------------------ -->
+
+          <!-- ACCOUNT PROPERTIES -->
+          <tr *ngIf="currentFileToMap.resource.name !== 'account'">
+            <td>
+              <table class="table table-striped table-hover">
+                <thead>
+                <tr><th>Account</th></tr>
+                </thead>
+                <tbody>
+                <tr *ngFor='let field of accountProperties; let i = index' id="{{field.id}}-prop">
+                  <td draggable="true" (dragstart)="drag($event)" id="{{field.id}}" class="draggable" *ngIf="field.title">
+                    {{field.label}}
+                    <span style="display: none;" class="{{field.field}}">{{field.field}}</span>
+                    <span style="display: none;" class="{{field.key}}">{{field.key}}</span>
+                    <span style="display: none;" class="{{field.id}}">{{field.id}}</span>
+                  </td>
+                  <td *ngIf="!field.title">
+                    <table class="table table-striped table-hover">
+                      <thead>
+                      <tr>
+                        <th>
+                          <span class="icon-add icon-plus pointer"
+                                (click)="addOneField(field, i)"
+                                *ngIf="field[0] && field[0].increment"
+                                style="margin-top: 5px;"></span>
+                          {{field[0].label}}
+                        </th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr *ngFor='let f of field' id="{{f.id}}-prop">
+                        <td draggable="true" (dragstart)="drag($event)" id="{{f.id}}" class="draggable">
+                          {{f.title}}
+                          <span style="display: none;" class="{{f.field}}">{{f.field}}</span>
+                          <span style="display: none;" class="{{f.key}}">{{f.key}}</span>
+                          <span style="display: none;" class="{{f.id}}">{{f.id}}</span>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <!-- ------------------ -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="width: 100%; height: 250px; overflow: auto;" *ngIf="step === 3">
+  <table class="table table-content" style="background: none; width: 100%">
+    <tr *ngFor="let feed of feedbacks">
+      <td width="30%" style="min-width: 175px; height: 0; padding: 0 8px;">{{feed.on}}</td>
+      <td width="20%" style="height: 0; padding: 0 8px;">{{feed.file}}</td>
+      <td width="50" style="min-width: 300px; height: 0; padding: 0 8px;">{{feed.message}}</td>
+    </tr>
+  </table>
+</div>
+
+<div class="pagination" *ngIf="!importInProgress">
+  <button style="width: 125px;" class="btn btn-sm btn-default" (click)="preview()" *ngIf="!hideNextOrPrevBtn('prev')">
+    <span>«</span> PREVIOUS STEP
+  </button>
+  <button style="width: 125px;" class="btn btn-sm btn-default" (click)="next()" *ngIf="!hideNextOrPrevBtn('next')">
+    NEXT STEP <span>»</span>
+  </button>
+  <button style="width: auto; float: right;" class="btn btn-sm btn-default"
+    (click)="showMessage('Add custom properties', 'You can add custom properties to any resource in the Admin section. If you want to use the custom properties here, you must however create them before importing your files into Loocho')"
+    *ngIf="step === 2">
+    <span class="icon-plus"></span> ADD CUSTOM PROPERTIES
+  </button>
+</div>
+
+<div [displayModal]="modalMessage" [size]="'md'" [blocked]="false" (close)="closeModal()">
+  <div class="modal-dialog modal-content">
+    <div class="modal-header">
+      <button class="close" (click)="closeModal()" aria-hidden="true">
+        <span class="icon-close"></span>
+      </button>
+      <h4 class="modal-title">{{modalTitle}}</h4>
+    </div>
+    <div class="modal-body table-content" style="min-height: 100px; font-size: 14px;">
+      <div *ngIf="modalMessage">
+        <span *ngIf="modalMessage">{{modalMessage}}</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button (click)="closeModal()" style="width: 50px; height: 25px;">Yes</button>
+    </div>
+  </div>
+</div>
+
+<div [displayModal]="viewerDataProperty" [size]="'lg'" [blocked]="false" (close)="closeModal()">
+  <div class="modal-dialog modal-content">
+    <div class="modal-header">
+      <button class="close" (click)="closeModal()" aria-hidden="true">
+        <span class="icon-close"></span>
+      </button>
+      <h4 class="modal-title">Viewer</h4>
+    </div>
+    <div class="modal-body table-content" style="min-height: 100px; font-size: 14px;">
+      <div *ngIf="viewerDataProperty" style="font-size: 12px;">
+        <table class="table table-striped table-hover">
+          <thead>
+          <tr>
+            <th *ngFor="let resultMap of viewerDataProperty">{{resultMap.title}}</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let line of viewerDataContents">
+            <td *ngFor="let resultMap of viewerDataProperty">
+              <span>{{line[resultMap.col]}}</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="feedbackTemplate" style="display: none">
+  <span>Your files import is complete. Here are your results:</span><br />
+  <span><b>Documents created:</b> {{totalCreated}}</span><br />
+  <span><b>Documents failed:</b> {{totalError}}</span><br />
+  <span><b>Total of documents:</b> {{nbToImport}}</span>
+  <br /><br /><hr />
+
+  <table class="feedback" style="text-align: center; width: 100%; background-color: none;">
+    <thead style="background-color: rgb(245, 249, 252);">
+      <tr>
+        <td style="border: 1px solid black; border-collapse: collapse;"></td>
+        <td style="border: 1px solid black; border-collapse: collapse;" *ngFor="let file of files"><b>{{file.name}}</b></td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border: 1px solid black; border-collapse: collapse;">Created</td>
+        <td style="border: 1px solid black; border-collapse: collapse;" *ngFor="let file of files">{{file.totalCreated}}</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; border-collapse: collapse;">Error</td>
+        <td style="border: 1px solid black; border-collapse: collapse;" *ngFor="let file of files">{{file.totalError}}</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; border-collapse: collapse;">Total</td>
+        <td style="border: 1px solid black; border-collapse: collapse;" *ngFor="let file of files">{{file.nbImported}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

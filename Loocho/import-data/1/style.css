@@ -1,0 +1,110 @@
+/**
+ * GENERAL
+ */
+.listFileToSelect {
+	margin-bottom: 20px;
+	width: 100%;
+	left: -15px;
+}
+.listFileToSelect select { height: 30px; }
+.elementList { height: 300px; overflow: auto }
+.btn-width { width: 75px; }
+
+/**
+ * DROP AND DRAG FOR STEP 1
+ */
+#my-drop-zone {
+	border: dotted 3px lightgray;
+	height: 225px;
+	background-color: #fff;
+	max-width: 1200px;
+	padding-top: 75px;
+	text-align: center;
+}
+#my-drop-zone > img {
+	width: 75px;
+  height: 75px;
+}
+
+/**
+ * DROP AND DRAG FOR STEP 2
+ */
+.draggable {
+	cursor: move;
+}
+
+/**
+ *
+ */
+.nav-pills.nav-wizard {
+	color: #fff;
+	margin-bottom: 20px;
+}
+.nav-pills.nav-wizard > li {
+  position: relative;
+  overflow: visible;
+  border-right: 15px solid transparent;
+  border-left: 15px solid transparent;
+	width: 25%;
+}
+.nav-pills.nav-wizard > li + li {
+  margin-left:0;
+}
+.nav-pills.nav-wizard > li:first-child {
+  border-left: 0;
+}
+.nav-pills.nav-wizard > li:first-child a {
+  border-radius: 5px 0 0 5px;
+}
+.nav-pills.nav-wizard > li:last-child {
+  border-right: 0;
+}
+.nav-pills.nav-wizard > li:last-child a {
+  border-radius: 0 5px 5px 0;
+}
+.nav-pills.nav-wizard > li a {
+  border-radius: 0;
+  background-color: #eee;
+	color: #333;
+}
+.nav-pills.nav-wizard > li .nav-arrow {
+  position: absolute;
+  top: 0px;
+  right: -20px;
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 20px 0 17px 20px;
+  border-color: transparent transparent transparent #eee;
+  z-index: 150;
+}
+.nav-pills.nav-wizard > li .nav-wedge {
+  position: absolute;
+  top: 0px;
+  left: -20px;
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 20px 0 17px 20px;
+  border-color: #eee #eee #eee transparent;
+  z-index: 150;
+}
+.nav-pills.nav-wizard > li:hover .nav-arrow {
+  border-color: transparent transparent transparent #aaa;
+}
+.nav-pills.nav-wizard > li:hover .nav-wedge {
+  border-color: #aaa #aaa #aaa transparent;
+}
+.nav-pills.nav-wizard > li:hover a {
+  background-color: #aaa;
+  color: #fff;
+}
+.nav-pills.nav-wizard > li.active .nav-arrow {
+  border-color: transparent transparent transparent rgb(86, 181, 139);
+}
+.nav-pills.nav-wizard > li.active .nav-wedge {
+  border-color: rgb(86, 181, 139) rgb(86, 181, 139) rgb(86, 181, 139) transparent;
+}
+.nav-pills.nav-wizard > li.active a {
+  background-color: rgb(86, 181, 139);/*#428bca;*/
+}

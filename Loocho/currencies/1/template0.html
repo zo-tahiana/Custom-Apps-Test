@@ -1,0 +1,13 @@
+<auto-list 
+  resource="currencies/currency" 
+  title="List of currencies configured for your team" 
+  columns="name,symbol,x|ref:x:currencies/xrate"
+  columnTitles="Name,Symbol,Exchange symbols"
+></auto-list>
+
+<auto-list 
+  resource="currencies/xrate" 
+  title="List of exchange rates" 
+  columns="x,rate"
+  columnTitles="Exchange symbols,Exchange rate"
+></auto-list>

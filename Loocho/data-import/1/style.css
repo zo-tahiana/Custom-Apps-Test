@@ -1,0 +1,253 @@
+/**
+ * GENERAL
+ */
+.listFileToSelect {
+  margin-bottom: 20px;
+  width: 100%;
+  left: -15px;
+}
+
+.listFileToSelect select {
+  height: 30px;
+}
+
+.elementList {
+  height: 300px;
+  overflow: auto;
+  margin-bottom: 5px;
+}
+
+.btn-width {
+  width: 125px;
+}
+
+.btn-default :hover {
+  color: black;
+}
+
+.btn-action {
+  width: 35px;
+  height: 30px;
+}
+
+.btn-preview span {
+  float: left;
+  margin-top: 4px;
+}
+
+.btn-next span {
+  float: right;
+  margin-top: 4px;
+}
+
+.div-preview {
+  width: 50%;
+  display: inline-block;
+  text-align: left;
+}
+
+.div-next {
+  width: 49.5%;
+  display: inline-block;
+  text-align: right;
+}
+
+.input-file {
+  display: inline-block;
+}
+
+.form-control-search-div {
+  width: 100%;
+  margin: 0;
+}
+
+.icon-add {
+  font-size: 13px;
+  float: right;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.pagination {
+  text-align: center;
+  width: 100%;
+}
+
+.pagination .icon {
+  padding: 10px;
+  background-color: rgb(127, 144, 157);
+  border-radius: 20px;
+  color: white;
+}
+
+.pagination .icon:hover {
+  background-color: #c8c8c8;
+}
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 0 !important;
+  }
+}
+
+/**
+ * DROP AND DRAG FOR STEP 1
+ */
+#my-drop-zone {
+  border: dashed 3px lightgray;
+  height: 125px;
+  background-color: #fff;
+  text-align: center;
+  line-height: 125px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 15px;
+}
+@media (max-width: 831px) {
+  #my-drop-zone {
+    font-size: 12px;
+  }
+}
+@media (max-width: 767px) {
+  #my-drop-zone {
+    font-size: 15px;
+  }
+}
+@media (max-width: 600px) {
+  #my-drop-zone {
+    font-size: 12px;
+  }
+}
+@media (max-width: 490px) {
+  #my-drop-zone {
+    line-height: normal;
+    white-space: normal;
+    text-overflow: inherit;
+    font-size: 12px;
+    padding-top: 15px;
+  }
+  #my-drop-zone img {
+    display: block;
+    margin: 0 auto;
+  }
+}
+#drop-zone-screen {
+  width: 100%;
+  height: auto;
+  min-height: calc(100vh - 115px);
+}
+
+#my-drop-zone > img {
+  width: 50px;
+  height: 50px;
+}
+
+/**
+ * DROP AND DRAG FOR STEP 2
+ */
+.draggable {
+  cursor: move;
+  width: 100em;
+}
+
+/**
+ *
+ */
+@media (max-width: 550px) {
+  .nav-pills a .title {
+    display: none !important;
+  }
+}
+@media (max-width: 355px) {
+  .nav-pills a .step {
+    display: none !important;
+  }
+  .nav-pills a {
+    text-align: center;
+  }
+}
+
+.nav-pills.nav-wizard {
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.nav-pills.nav-wizard > li {
+  position: relative;
+  overflow: visible;
+  border-right: 15px solid transparent;
+  border-left: 15px solid transparent;
+  width: 33.3%;
+}
+
+.nav-pills.nav-wizard > li + li {
+  margin-left: 0;
+}
+
+.nav-pills.nav-wizard > li:first-child {
+  border-left: 0;
+}
+
+.nav-pills.nav-wizard > li:first-child a {
+  border-radius: 5px 0 0 5px;
+}
+
+.nav-pills.nav-wizard > li:last-child {
+  border-right: 0;
+}
+
+.nav-pills.nav-wizard > li:last-child a {
+  border-radius: 0 5px 5px 0;
+}
+
+.nav-pills.nav-wizard > li a {
+  border-radius: 0;
+  background-color: #eee;
+  color: #333;
+  cursor: default;
+}
+.nav-pills a:active {
+  outline: none;
+}
+
+.nav-pills.nav-wizard > li .nav-arrow {
+  position: absolute;
+  top: 0px;
+  right: -20px;
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 20px 0 17px 20px;
+  border-color: transparent transparent transparent #eee;
+  z-index: 150;
+}
+
+.nav-pills.nav-wizard > li .nav-wedge {
+  position: absolute;
+  top: 0px;
+  left: -20px;
+  width: 0px;
+  height: 38px;
+  border-style: solid;
+  border-width: 20px 0 17px 20px;
+  border-color: #eee #eee #eee transparent;
+  z-index: 150;
+}
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  .nav-pills.nav-wizard > li .nav-wedge { height: 0px; }
+}
+
+.nav-pills.nav-wizard > li.active .nav-arrow {
+  border-color: transparent transparent transparent rgb(86, 181, 139);
+}
+
+.nav-pills.nav-wizard > li.active .nav-wedge {
+  border-color: rgb(86, 181, 139) rgb(86, 181, 139) rgb(86, 181, 139) transparent;
+}
+
+.nav-pills.nav-wizard > li.active a {
+  background-color: rgb(86, 181, 139); /*#428bca;*/
+}

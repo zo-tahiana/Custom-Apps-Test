@@ -1,0 +1,279 @@
+.arrow-head {
+  border-right: 2px solid #ddd;
+  min-width: 240px;
+}
+
+.amount {
+  padding-right: 8px;
+}
+
+.counts {
+  line-height: 5px;
+}
+
+.avatar, .deal-name {
+  display: inline-block;
+}
+
+.deal-name {
+  padding-right: 8px;
+  font-size: 14px;
+  width: auto;
+}
+
+.avatar {
+  padding-left: 8px;
+}
+
+.avatar > img {
+  margin-top: -5px;
+  margin-right: 5px;
+  width: 20px;
+  border-radius: 50%;
+}
+
+td {
+  border-right: 2px solid #ddd;
+  padding: 0 !important;
+  background-color: rgb(243, 245, 246);
+}
+
+.deal p {
+  padding-left: 8px;
+}
+
+.deal > div {
+  display: inline-block;
+}
+
+.stage {
+  vertical-align: top;
+  height: 50vh;
+}
+
+.deal {
+  cursor: pointer;
+  min-height: 72px;
+  padding-top: 8px;
+  border-bottom: 1px solid #ddd;
+  background-color: #fff;
+}
+
+.deal:hover {
+  color: rgb(84, 104, 119);
+}
+
+.opportunity-stages {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.status {
+  width: 18px;
+  height: 18px;
+  z-index: 8;
+  margin: 18px 8px 0 0;
+  background-size: 100% 100%;
+}
+
+.stage-lost {
+  background-color: rgb(232, 70, 70);
+}
+
+.stage-won {
+  background-color: rgb(67, 195, 94);
+}
+
+.stage-delete {
+  background-color: rgb(203, 208, 208);
+}
+
+.stage-lost-hover {
+  box-shadow: 0 0 5px 4px rgb(232, 70, 70);
+}
+
+.stage-won-hover {
+  box-shadow: 0 0 5px 4px rgb(67, 195, 94);
+}
+.stage-delete-hover {
+  box-shadow: 0 0 5px 4px rgb(203, 208, 208);
+}
+
+.ondragover {
+  background-color: #ddd;
+}
+
+.stage-container {
+  height: 52px;
+  padding: 8px 0;
+  width: calc(100% - 300px);
+  background-color: #fff;
+  position: fixed;
+  bottom: 0;
+  box-shadow: 0 0 5px 4px rgba(0,0,0,.22);
+  text-align: center;
+}
+
+@media only screen and (max-width: 768px) {
+  .stage-container {
+    width: calc(100% - 60px);
+  }
+}
+
+.other-stage {
+  width: 30%;
+  height: 100%;
+  margin: 0 1%;
+  display: inline-block;
+  font-size: 20px;
+  color: #fff;
+  border-radius: 5px;
+  padding-top: 7px;
+  overflow: hidden;
+}
+
+.bubble {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 4px;
+  width: 260px;
+  border: #ccc solid 1px;
+}
+
+.bubble:after {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 15px;
+  border-style: solid;
+  border-width: 0 9px 9px;
+  border-color: #f5f5f5 transparent;
+}
+
+.bubble:before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  border-style: solid;
+  border-width: 0 10px 10px;
+  border-color: #ccc transparent;
+}
+
+.bubble-heading, .bubble-body, .bubble-footer {
+  padding: 8px;
+}
+
+.bubble-item {
+  padding: 12px 8px;
+}
+
+.bubble-heading {
+  background-color: #f5f5f5;
+}
+
+.bubble-heading, .bubble-item {
+  border-bottom: 1px solid #e3e3e3;
+}
+
+.bubble-item:last-child {
+  border: none;
+}
+
+.bubble-heading p {
+  margin-bottom: 0;
+}
+
+.bubble-heading:first-child {
+  border-radius: 4px 4px 0 0;
+}
+
+.bubble-footer {
+  background-color: #f5f5f5;
+  border-top: 1px solid #e3e3e3;
+}
+
+.bubble-footer:last-child {
+  border-radius: 0 0 4px 4px;
+}
+
+.overdue {
+  color: #e84646;
+}
+
+.today {
+  color: rgb(67, 195, 94);
+}
+
+.bubble-item:hover {
+  background-color: rgb(86, 181, 139);
+  color: #fff !important;
+  cursor: pointer;
+}
+
+.bubble-item:hover .overdue, .bubble-item:hover .today {
+  color: #fff !important;
+}
+
+.new-activity, .bubble-footer .bubble-span {
+  color: rgb(86, 181, 139);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.new-activity .bubble-span:hover {
+  text-decoration: underline;
+}
+
+.bubble-icon {
+  color: #ccc;
+  margin-right: 10px;
+  margin-top: -10px;
+  font-size: 18px;
+  font-weight: bold;
+  -webkit-transition: 0.1s ease;
+  -o-transition: 0.1s ease;
+  transition: 0.1s ease;
+}
+
+.bubble-icon:hover {
+  color: rgb(164, 205, 58);
+}
+
+.bubble-content {
+  display: inline-block;
+}
+
+.bubble-subject {
+  line-height: 0.5em;
+  font-size: 14px;
+}
+
+.bubble-td {
+  vertical-align: middle;
+}
+
+.bubble-td {
+  border: transparent;
+  background-color: transparent;
+}
+
+.bubble-item table {
+  background-color: transparent;
+}
+
+.bubble-title {
+  font-size: 14px;
+}
+
+.table-content {
+  overflow-y: hidden !important;
+}
+
+.div-right .btn {
+  margin-right: 8px;
+}
+
+.div-right .btn:last-child {
+  margin-right: 0;
+}

@@ -1,0 +1,254 @@
+<!-- Control -->
+<div class="mob-center row row-centered">
+  <!-- Row -->
+  <div class="col-md-2 align-centered">
+    Show
+    <select class="form-control-loocho" (change)="changeStateFilter($event)">
+      <option value="" selected>All</option>
+      <option value="0">Overdue</option>
+      <option value="1">No activities</option>
+      <option value="2">Closing today</option>
+      <option value="3">Closing in next 7 days</option>
+      <option [value]="month">Closing this month</option>
+      <option [value]="nextMonth">Closing next month</option>
+      <option [value]="afterNextMonth">Closing after next month</option>
+
+    </select>
+  </div>
+  <!-- Search -->
+  <div class="col-md-3 align-centered no-padding form-control-search-div">
+    <div class="inner-addon right-addon">
+      <i class="glyphicon glyphicon-search"></i>
+      <input placeholder="Search Deals" class="form-control form-control-search" (keyup)="searchDeal($event.target.value)"/>
+    </div>
+  </div>
+  <!-- Create new -->
+  <div class="div-right">
+    <button class="btn btn-loocho btn-sm" *ngFor="let couple of coupleStRes" (click)="createNew(couple.resource)">
+      <span class="icon-plus"></span> CREATE NEW {{ couple.resource.split('/')[1] | uppercase }}
+    </button>
+  </div>
+</div><br />
+<!-- =============== -->
+
+<!-- Table -->
+<div class="table-content" *ngIf="stages && stages.length">
+  <table class="table">
+    <thead>
+    <tr>
+      <th class="arrow-head" *ngFor="let stage of stages" [ngStyle]="thStyle">
+        <p class="opportunity-stages">{{stage.label | uppercase}}</p>
+        <p *ngFor="let cur of stage.currencies" class="counts">
+            <span>
+              <span class="amount">
+                {{ stage[cur].amount|currency:cur:true }}
+              </span>
+              <small class="text-muted">
+                {{ stage[cur].deals }} {{ stage[cur].deals > 1 ? 'deals' : 'deal' }}
+              </small>
+            </span>
+        </p>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td *ngFor="let stage of stages"
+          class="stage"
+          (dragover)="dragOver($event, stage)"
+          (dragleave)="dragLeave();"
+          (drop)="drop($event)"
+          [ngClass]="{ondragover: stageOnOver === stage}"
+          nowrap
+      >
+        <div *ngFor="let deal of deals" (click)="editDeal(deal, $event)">
+          <div
+            class="deal"
+            *ngIf="(deal.status === stage._id || deal.stage === stage._id) && (deal.resource === stage.resource) &&
+                    ((!stateFilter && stateFilter !== 0) || (stateFilter === deal.delayState) ||
+                    ((deal.month) && ((stateFilter.length > 1 &&
+                    stateFilter === deal.month)
+                    || (stateFilter === afterNextMonth &&
+                    nextMonth < deal.month))))"
+            draggable="true"
+            (dragstart)="dragStart($event, deal)"
+            (dragend)="dragEnd($event)"
+          >
+            <div class="status pull-right"
+                 [ngStyle]="getIcon(deal.delayState)"
+                 (click)="showActivities(deal)"
+            ></div>
+            <div>
+              <div class="avatar">
+                <img alt="Avatar" src="media/images/exemple.jpg">
+              </div>
+              <div class="deal-name">
+                {{deal.desc || deal.name}}
+              </div>
+              <p>{{deal.amount | currency:deal.amount$CUR:true }} &nbsp;&nbsp;
+                {{deal.org}} {{ deal.account | ref:'name':'core/account'}}</p>
+            </div>
+          </div>
+        </div>
+        <br/><br/>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<!-- =============== -->
+
+<!-- Stage Container -->
+<div class="stage-container loocho-animated fadeInUp" *ngIf="showStageContainer">
+  <div class="other-stage stage-delete"
+       [ngClass]="{'stage-delete-hover': stageOnOver === 'delete'}"
+       (dragover)="dragOver($event, 'delete')"
+       (dragleave)="stageOnOver = null;"
+       (drop)="drop($event)">
+    <span class="icon-trash"></span> DELETE
+  </div>
+  <div class="other-stage stage-lost"
+       *ngIf="currentStagesClosed.length"
+       [ngClass]="{'stage-lost-hover': stageOnOver === 'lost'}"
+       (dragover)="dragOver($event, 'lost')"
+       (dragleave)="stageOnOver = null;"
+       (drop)="drop($event)">
+    <span class="icon-close"></span> {{currentStagesClosed.length === 2 ? 'LOST' : 'CLOSED'}}
+  </div>
+  <div class="other-stage stage-won"
+       *ngIf="currentStagesClosed.length > 1"
+       [ngClass]="{'stage-won-hover': stageOnOver === 'won'}"
+       (dragover)="dragOver($event, 'won')"
+       (dragleave)="stageOnOver = null;"
+       (drop)="drop($event)">
+    <span class="icon-check"></span> WON
+  </div>
+</div>
+<!-- =============== -->
+<br/><br/>
+
+<!-- Popover -->
+<div class="bubble" *ngIf="showPopover" [style.top.px]="bubble.top" [style.left.px]="bubble.left">
+
+  <div class="bubble-heading" *ngIf="currentDeal && currentDeal.closeOn">
+    Estimated closing date :
+    <span [ngClass]="{today: currentDeal.deadline === 'Today', overdue: currentDeal.closeOn < today}">
+      {{currentDeal.closeOn > today ? 'in': ''}}
+      {{currentDeal.deadline}}
+      {{currentDeal.closeOn < today ? 'overdue': ''}}
+    </span>
+  </div>
+
+  <!-- no activities -->
+  <div class="bubble-body"
+       *ngIf="currentDeal && !(currentActivities.overdue && currentActivities.overdue.length)
+       && !(currentActivities.scheduled && currentActivities.scheduled.length)">
+    You have no scheduled activities for this {{currentDeal.resource.split('/')[1] }}
+  </div>
+
+  <!-- overdue -->
+  <div class="bubble-heading" *ngIf="currentActivities.overdue && currentActivities.overdue.length">
+    <p class="bubble-title overdue">OVERDUE ({{currentActivities.overdue.length}})</p>
+  </div>
+  <div class="bubble-list" *ngIf="currentActivities.overdue">
+    <div class="bubble-item" *ngFor="let activity of currentActivities.overdue" (click)="editActivity(activity, $event)">
+      <table>
+        <tr>
+          <td class="bubble-td">
+            <span class="icon-check bubble-icon" (click)="doneActivity(activity)"></span>
+          </td>
+          <td class="bubble-td">
+            <p class="bubble-subject">{{activity.subject}}</p>
+            <span class="bubble-span overdue">{{activity.deadline}} overdue</span>
+            {{activity.assign ? '-' : ''}} {{activity.assign | ref:'name':'login/user'}}<br/>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- scheduled -->
+  <div class="bubble-heading" *ngIf="currentActivities.scheduled && currentActivities.scheduled.length">
+    <p class="bubble-title">SCHEDULED ({{currentActivities.scheduled.length}})</p>
+  </div>
+  <div class="bubble-list" *ngIf="currentActivities.scheduled">
+    <div class="bubble-item" *ngFor="let activity of currentActivities.scheduled" (click)="editActivity(activity, $event)">
+      <table>
+        <tr>
+          <td class="bubble-td">
+            <span class="icon-check bubble-icon" (click)="doneActivity(activity)"></span>
+          </td>
+          <td class="bubble-td">
+            <p class="bubble-subject">{{activity.subject}}</p>
+            <span class="bubble-span" [ngClass]="{today: activity.deadline === 'Today'}">{{activity.deadline === 'Today' ? '': 'Deadline in'}}
+            {{activity.deadline}}</span>
+            {{activity.assign ? '-' : ''}} {{activity.assign | ref:'name':'login/user'}}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div class="bubble-footer text-center new-activity" (click)="createActivity()">
+    + <span class="bubble-span">Schedule an activity</span>
+  </div>
+</div>
+<!-- =============== -->
+
+<!-- Display Modal Doc-Auto-Edit -->
+
+<div [displayModal]="editDoc" [blocked]="false" [size]="'lg'" (close)="editDoc = null">
+  <div class="modal-dialog modal-content">
+
+    <div class="modal-header">
+      <div class="pull-right">
+        <button
+          style="margin-right: 10px; width: 100px;"
+          *ngIf="editDoc && editDoc._id" class="btn btn-loocho btn-sm" (click)="editMode = !editMode">
+          <span [class.icon-eye]="editMode" [class.icon-note]="!editMode"></span>
+          {{editMode ? ' View' : ' Edit'}}
+        </button>
+        <span class="icon-close close" (click)="editDoc = null" aria-hidden="true"></span>
+      </div>
+      <h4 class="modal-title" *ngIf="editDoc">{{ !editDoc._id ? 'Create new' : (editMode ? 'Edit' : 'View details of') }} {{ customData.getLabel(resource).sg }}</h4>
+    </div>
+
+    <div class="modal-body" *ngIf="editDoc">
+      <doc-auto-edit
+        [resource]="resource"
+        [document]="editDoc"
+        [mode]="editMode ? 'edit' : 'editable'"
+        [triggerSave]="triggerSave"
+        [triggerDelete]="triggerDelete"
+        (onsaved)="saveDoc($event)"
+        [showActions]="false"
+      ></doc-auto-edit>
+    </div>
+
+    <div class="modal-footer">
+      <button style="width: 100px;" class="btn btn-loocho btn-sm" (click)="triggerSave = true;" [disabled]="triggerSave"><span class="icon-check"></span> SAVE</button>
+      <button style="width: 100px;" class="btn btn-loocho btn-sm" *ngIf="editMode" (click)="triggerDelete = true" [disabled]="triggerDelete"><span class="icon-trash"></span> DELETE</button>
+      <button style="width: 100px;" class="btn btn-loocho btn-sm" (click)="editDoc = null"><span class="icon-close"></span> {{editMode ? 'CANCEL' : 'CLOSE'}}</button>
+    </div>
+  </div>
+</div>
+<!-- =============== -->
+
+<!-- Display Alert -->
+
+<div [displayModal]="wrongColumn" [blocked]="false" size="sm">
+  <div class="modal-dialog modal-content">
+
+    <div class="modal-body" style="font-size: 16px;">
+      {{ message }}
+    </div>
+
+    <div class="modal-footer text-center">
+      <button style="width: 100%;" class="btn btn-loocho btn-md" (click)="wrongColumn = null;">
+        <span class="icon-check"></span> OK
+      </button>
+    </div>
+  </div>
+</div>
+<!-- =============== -->
